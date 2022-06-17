@@ -1,0 +1,13 @@
+apiVersion: v2
+name: istiod
+version: 1.13.3
+appVersion: "1.13.3-tetrate-multiarch-v1"
+description: Helm chart for istio control plane
+keywords:
+  - istio
+  - istiod
+  - istio-discovery
+sources:
+  - http://github.com/istio/istio
+engine: gotpl
+icon: https://istio.io/latest/favicons/android-192x192.png
