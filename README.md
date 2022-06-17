@@ -2,7 +2,7 @@
 
 Helm charts to deploy istio components.Helm charts default to multi-arch istio images, included docker images support multiple architecture i.e single image can run on x86 or arm based processor.
 
-# Available Release
+# Available Releases
 
 - [Istio 1.13.5](https://istio.io/latest/news/releases/1.13.x/announcing-1.13.5/)
 - [Istio 1.13.3](https://istio.io/latest/news/releases/1.13.x/announcing-1.13.3/)
