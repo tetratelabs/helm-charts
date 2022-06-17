@@ -36,15 +36,15 @@ kubectl create namespace istio-system
 
 ```sh
 helm install istio-base tetratelabs/base -n istio-system
-// install specific version eg 1.13.3
+// Install specific version eg 1.13.3
 helm install istio-base tetratelabs/base -n istio-system --version 1.13.3
 ```
 3. To customize the installation or check the configuration option
 
 ```sh
-// to inspect the values.yaml for particular chart
+// To inspect the values.yaml for particular chart
 helm show values tetratelabs/istiod
-// to check the  output of the chart in fully rendered Kubernetes resource templates
+// To check the  output of the chart in fully rendered Kubernetes resource templates
 helm template tetratelabs/istiod
 ```
 
@@ -52,8 +52,10 @@ helm template tetratelabs/istiod
 
 ```sh
 helm install istiod tetratelabs/istiod -n istio-system
-// install specific version eg 1.13.3
+// Install specific version eg 1.13.3
 helm install istiod tetratelabs/istiod -n istio-system --version 1.13.3
+// Install istio with distroless images.
+helm install istiod tetratelabs/istiod -n istio-system --set global.tag=1.13.3-tetrate-multiarch-v1-distroless --wait
 ```
 NOTE: Helm will always install the latest release of istio, Please check the available release/tags to install specific version using previous example.
 
@@ -62,7 +64,7 @@ NOTE: Helm will always install the latest release of istio, Please check the ava
 ```sh
 kubectl create namespace istio-ingress
 helm install istio-ingress itetratelabs/istio-ingress -n istio-ingress
-// install specific version eg 1.13.3
+// Install specific version eg 1.13.3
 helm install istio-ingress itetratelabs/istio-ingress -n istio-ingress --version 1.13.3
 ```
 
