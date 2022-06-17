@@ -1,6 +1,13 @@
 # Tetrate Istio Distribition(TID)  Helm Charts
 
-Helm charts to deploy istio components.These charts defaults to multi-arch istio images which can be run  on x86 and Arm based Instances, included docker images support multiple architecture i.e single image can run on x86 or arm based processor.
+Helm charts to deploy istio components.Helm charts default to multi-arch istio images, included docker images support multiple architecture i.e single image can run on x86 or arm based processor.
+
+# Available Release
+
+- [Istio 1.13.5](https://istio.io/latest/news/releases/1.13.x/announcing-1.13.5/)
+- [Istio 1.13.3](https://istio.io/latest/news/releases/1.13.x/announcing-1.13.3/)
+
+Helm charts to deploy istio components.Helm charts default to multi-arch istio images, included docker images support multiple architecture i.e single image can run on x86 or arm based processor.
 
 ## Setup Helm repo
 
