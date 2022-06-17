@@ -1,6 +1,6 @@
-# Tetrate Istio Distribition(TID)  Helm Charts
+# Tetrate Istio Distribition (TID)  Helm Charts
 
-Helm charts to deploy istio components.Helm charts default to multi-arch istio images, included docker images support multiple architecture i.e single image can run on x86 or arm based processor.
+This repository contains Helm charts to deploy the TID istio components.  These Helm charts default to multi-arch istio images with support for x64 and ARM architectures.
 
 # Available Releases
 
