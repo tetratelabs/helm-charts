@@ -55,6 +55,7 @@ helm install istiod tetratelabs/istiod -n istio-system
 // install specific version eg 1.13.3
 helm install istiod tetratelabs/istiod -n istio-system --version 1.13.3
 ```
+NOTE: Helm will always install the latest release of istio, Please check the available release/tags to install specific version using previous example.
 
 5. Install Istio ingress and egress gateways (optional)
 
