@@ -26,7 +26,7 @@ helm install istio-ingress tetratelabs/istio-ingress -n istio-ingress
 To uninstall/delete the `istio-ingressgateway` deployment:
 
 ```console
-helm delete istio-ingressgateway
+helm delete istio-ingress -n istio-ingress
 ```
 
 ## Configuration
