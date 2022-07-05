@@ -5,8 +5,9 @@ This chart installs an Istio gateway deployment.
 ## Setup Repo Info
 
 ```console
-helm repo add istio https://istio-release.storage.googleapis.com/charts
+helm repo add tetratelabs https://tetratelabs.github.io/helm-charts/
 helm repo update
+helm repo ls
 ```
 
 _See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation._
@@ -16,7 +17,8 @@ _See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation
 To install the chart with the release name `istio-ingressgateway`:
 
 ```console
-helm install istio-ingressgateway istio/gateway
+kubectl create namespace istio-ingress
+helm install istio-ingress tetratelabs/istio-ingress -n istio-ingress
 ```
 
 ## Uninstalling the Chart
