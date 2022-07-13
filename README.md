@@ -63,9 +63,9 @@ NOTE: Helm will always install the latest release of istio, Please check the ava
 
 ```sh
 kubectl create namespace istio-ingress
-helm install istio-ingress itetratelabs/istio-ingress -n istio-ingress
+helm install istio-ingress tetratelabs/istio-ingress -n istio-ingress
 // Install specific version eg 1.13.3
-helm install istio-ingress itetratelabs/istio-ingress -n istio-ingress --version 1.13.3
+helm install istio-ingress tetratelabs/istio-ingress -n istio-ingress --version 1.13.3
 ```
 
 
