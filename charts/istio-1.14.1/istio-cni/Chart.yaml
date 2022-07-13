@@ -1,0 +1,14 @@
+apiVersion: v2
+name: cni
+version: 1.14.1
+appVersion: "1.14.1-tetrate-multiarch-v1"
+description: Helm chart for istio-cni components
+keywords:
+  - istio-cni
+  - istio
+  - tid
+  - istio-multiarch
+sources:
+- http://github.com/istio/istio
+- https://istio.tetratelabs.io
+icon: https://istio.tetratelabs.io/images/getistio-favicon.png

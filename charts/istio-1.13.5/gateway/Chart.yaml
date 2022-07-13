@@ -5,9 +5,10 @@ appVersion: 1.13.5-tetrate-multiarch-v1
 description: Helm chart for deploying Istio gateways
 sources:
 - http://github.com/istio/istio
-icon: https://istio.io/latest/favicons/android-192x192.png
+- https://istio.tetratelabs.io
 keywords:
 - istio
 - gateways
-engine: gotpl
-icon: https://istio.io/latest/favicons/android-192x192.png
+- tid
+- istio-multiarch 
+icon: https://istio.tetratelabs.io/images/getistio-favicon.png

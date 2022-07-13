@@ -150,6 +150,10 @@ spec:
 {{- else }}
 {{ toYaml .Values.global.defaultResources | indent 12 }}
 {{- end }}
+{{- if $gateway.lifecycle }}
+          lifecycle:
+{{- toYaml $gateway.lifecycle | nindent 12 }}
+{{- end }}
           env:
           - name: JWT_POLICY
             value: {{ .Values.global.jwtPolicy }}
@@ -225,6 +229,8 @@ spec:
           - name: ISTIO_META_CLUSTER_ID
             value: "{{ $.Values.global.multiCluster.clusterName | default `Kubernetes` }}"
           volumeMounts:
+          - name: ingressgateway-certs
+            mountPath: /etc/istio/ingressgateway-certs
           - name: istio-envoy
             mountPath: /etc/istio/proxy
           - name: config-volume
@@ -264,6 +270,8 @@ spec:
 {{ toYaml $gateway.additionalContainers | indent 8 }}
 {{- end }}
       volumes:
+      - emptyDir: {}
+        name: ingressgateway-certs   
 {{- if eq .Values.global.pilotCertProvider "istiod" }}
       - name: istiod-ca-cert
         configMap:

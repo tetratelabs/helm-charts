@@ -6,7 +6,9 @@ description: Helm chart for istio-cni components
 keywords:
   - istio-cni
   - istio
+  - tid
+  - istio-multiarch
 sources:
-  - http://github.com/istio/cni
-engine: gotpl
-icon: https://istio.io/latest/favicons/android-192x192.png
+- http://github.com/istio/istio
+- https://istio.tetratelabs.io
+icon: https://istio.tetratelabs.io/images/getistio-favicon.png

@@ -1,0 +1,14 @@
+apiVersion: v2
+name: istiod-remote
+version: 1.14.1
+appVersion: "1.14.1-tetrate-multiarch-v1"
+description: Helm chart for a remote cluster using an external istio control plane
+keywords:
+  - istio
+  - external-istiod
+  - tid
+  - istio-multiarch
+sources:
+- http://github.com/istio/istio
+- https://istio.tetratelabs.io
+icon: https://istio.tetratelabs.io/images/getistio-favicon.png

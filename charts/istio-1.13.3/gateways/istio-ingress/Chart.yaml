@@ -7,7 +7,9 @@ keywords:
   - istio
   - ingressgateway
   - gateways
+  - tid
+  - istio-multiarch
 sources:
-  - http://github.com/istio/istio
-engine: gotpl
-icon: https://istio.io/latest/favicons/android-192x192.png
+- http://github.com/istio/istio
+- https://istio.tetratelabs.io
+icon: https://istio.tetratelabs.io/images/getistio-favicon.png

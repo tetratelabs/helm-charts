@@ -36,6 +36,12 @@ gateways:
     cpu:
       targetAverageUtilization: 80
 
+    lifecycle: 
+      preStop:
+        exec:
+          command: ["sh", "-c",
+            "sleep 5"]
+
     resources:
       requests:
         cpu: 100m
@@ -58,9 +64,9 @@ gateways:
 
     ##############
     secretVolumes:
-    - name: ingressgateway-certs
-      secretName: istio-ingressgateway-certs
-      mountPath: /etc/istio/ingressgateway-certs
+    # - name: ingressgateway-certs
+    #   secretName: istio-ingressgateway-certs
+    #   mountPath: /etc/istio/ingressgateway-certs
     - name: ingressgateway-ca-certs
       secretName: istio-ingressgateway-ca-certs
       mountPath: /etc/istio/ingressgateway-ca-certs
@@ -77,7 +83,9 @@ gateways:
       annotations: {}
 
     ### Advanced options ############
-    env: {}
+
+    env: 
+      OUTPUT_CERTS: /etc/istio/ingressgateway-certs
     nodeSelector: {}
     tolerations: []
 

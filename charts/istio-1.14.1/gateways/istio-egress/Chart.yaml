@@ -1,0 +1,15 @@
+apiVersion: v2
+name: istio-egress
+version: 1.14.1
+appVersion: "1.14.1-tetrate-multiarch-v1"
+description: Helm chart for deploying Istio gateways
+keywords:
+  - istio
+  - egressgateway
+  - gateways
+  - tid
+  - istio-multiarch
+sources:
+- http://github.com/istio/istio
+- https://istio.tetratelabs.io
+icon: https://istio.tetratelabs.io/images/getistio-favicon.png
