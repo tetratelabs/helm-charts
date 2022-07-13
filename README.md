@@ -4,6 +4,7 @@ This repository contains Helm charts to deploy the TID istio components.  These 
 
 # Available Releases
 
+- [Istio 1.14.1](https://istio.io/latest/news/releases/1.14.x/announcing-1.14.1/)
 - [Istio 1.13.5](https://istio.io/latest/news/releases/1.13.x/announcing-1.13.5/)
 - [Istio 1.13.3](https://istio.io/latest/news/releases/1.13.x/announcing-1.13.3/)
 
