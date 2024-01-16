@@ -1,0 +1,33 @@
+name: Release a revision
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "charts/istio/**"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+      - name: Run revision releaser
+        id: releaser
+        run: |
+          ./scripts/pr.sh ${{ github.ref }} ${{ vars.HELM_URL }}
+      - name: Create a Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: istio-${{ steps.releaser.outputs.VERSION }}
+          token: ${{ secrets.GH_TOKEN }}
+          files: |
+            ${{ steps.releaser.outputs.BUILDDIR }}/*.tgz
+            ${{ steps.releaser.outputs.INDEX }}

@@ -1,0 +1,58 @@
+name: Release a revision
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "charts/istio/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "charts/istio/**"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+
+      - name: Run revision releaser
+        id: releaser
+        run: |
+          ./scripts/pr.sh ${{ github.ref }} ${{ vars.HELM_URL }}
+      - name: Create a Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: istio-${{ github.ref }}
+          token: ${{ secrets.GH_TOKEN }}
+          files: |
+            ${{ steps.releaser.outputs.BUILDDIR }}/*.tgz
+      - name: Commit files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "Update to ${{ steps.releaser.outputs.VERSION }}"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          branch: gh-pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

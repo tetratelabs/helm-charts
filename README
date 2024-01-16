@@ -1,0 +1,6 @@
+# Workflow
+
+1. Put a new release under charts/istio/${VERSION}
+2. Push and tag with `istio-${VERSION}` name
+3. Release artifacts will be available at Release page
+4. index.yaml is updated in Github Pages
