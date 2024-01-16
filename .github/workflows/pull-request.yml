@@ -1,4 +1,4 @@
-name: Release a revision
+name: Make a PR of a revision
 on:
   pull_request:
     branches:
@@ -6,13 +6,8 @@ on:
     paths:
       - "charts/istio/**"
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,14 +15,9 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
       - name: Run revision releaser
-        id: releaser
+        id: builder
         run: |
-          ./scripts/pr.sh ${{ github.ref }} ${{ vars.HELM_URL }}
-      - name: Create a Release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: istio-${{ steps.releaser.outputs.VERSION }}
-          token: ${{ secrets.GH_TOKEN }}
-          files: |
-            ${{ steps.releaser.outputs.BUILDDIR }}/*.tgz
-            ${{ steps.releaser.outputs.INDEX }}
+          ./scripts/pr.sh ${{ github.head_ref }} ${{ vars.HELM_URL }}
+      - name: Test
+        run: |
+          ./scripts/test.sh ${{ github.head_ref }}

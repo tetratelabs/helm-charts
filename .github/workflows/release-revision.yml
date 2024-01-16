@@ -1,15 +1,15 @@
 name: Release a revision
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "charts/istio/**"
   pull_request:
+    types: [closed]
     branches:
       - main
     paths:
       - "charts/istio/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: write
@@ -19,28 +19,45 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install Helm
         uses: azure/setup-helm@v3
-
+      - name: Run revision builder
+        id: builder
+        run: |
+          ./scripts/pr.sh ${{ github.event.pull_request.head.ref }} ${{ vars.HELM_URL }}
       - name: Run revision releaser
         id: releaser
         run: |
-          ./scripts/pr.sh ${{ github.ref }} ${{ vars.HELM_URL }}
+          ./scripts/release.sh ${{ github.event.pull_request.head.ref }}
+      - name: Tag
+        run: |
+          git reset --hard
+          git switch main
+          git pull
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git tag release-istio-${{ steps.builder.outputs.VERSION }} -m "${{ github.event.pull_request.head.ref }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}"
+          git push origin release-istio-${{ steps.builder.outputs.VERSION }}
       - name: Create a Release
         uses: softprops/action-gh-release@v1
         with:
-          name: istio-${{ github.ref }}
+          name: istio-${{ steps.builder.outputs.VERSION }}
           token: ${{ secrets.GH_TOKEN }}
+          tag_name: release-istio-${{ steps.builder.outputs.VERSION }}
+          draft: false
+          prerelease: false
           files: |
-            ${{ steps.releaser.outputs.BUILDDIR }}/*.tgz
+            ${{ steps.builder.outputs.BUILDDIR }}/*.tgz
+            ${{ steps.builder.outputs.INDEX }}
       - name: Commit files
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          git reset --hard
+          git switch gh-pages
+          cp -f ${{ steps.builder.outputs.INDEX }}/index.yaml index.yaml
+          git add index.yaml
           git commit -a -m "Update to ${{ steps.releaser.outputs.VERSION }}"
       - name: Push changes
         uses: ad-m/github-push-action@master
@@ -52,7 +69,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: "${{ steps.builder.outputs.INDEX }}"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

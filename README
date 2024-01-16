@@ -1,6 +1,6 @@
 # Workflow
 
-1. Put a new release under charts/istio/${VERSION}
-2. Push and tag with `istio-${VERSION}` name
+1. Create a PR off a branch in `update-istio-XXXX` format
+2. Check the MR, adapt when necessary, then merge
 3. Release artifacts will be available at Release page
 4. index.yaml is updated in Github Pages
