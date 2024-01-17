@@ -1,6 +1,15 @@
 # Workflow
 
-1. Create a PR off a branch in `update-istio-XXXX` format
+1. Create a PR off a branch in `update-istio-APPVERSION` format
 2. Check the MR, adapt when necessary, then merge
 3. Release artifacts will be available at Release page
 4. index.yaml is updated in Github Pages
+
+# Settings
+
+These are the settings required for the Actions scripts
+
+- Secrets:
+  - GH_TOKEN: This is Github token
+- Variables
+  - HELM_URL: This is the URL prefix of the gh-pages, eg. https://github.com/tetratelabs/charts/releases/download
