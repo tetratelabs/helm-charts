@@ -39,7 +39,7 @@ for ITEM in $ITEMS; do
         continue
     fi
     ISTIO_VERSION=$(cat $HERE/charts/istio/$VERSION/$ITEM/Chart.yaml| grep version: | awk '{print $2}')
-    CHART_URL=$URL/istio-$VERSION/$ITEM-$ISTIO_VERSION.tgz
+    CHART_URL=$URL/release-istio-$VERSION/$ITEM-$ISTIO_VERSION.tgz
     LAST_ITEM=/$ITEM-$ISTIO_VERSION.tgz/
     echo "Processing $ITEM $ISTIO_VERSION $CHART_URL"
     helm package $HERE/charts/istio/$VERSION/$ITEM
