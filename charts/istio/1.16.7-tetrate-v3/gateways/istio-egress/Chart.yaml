@@ -1,0 +1,12 @@
+apiVersion: v1
+appVersion: 1.16.7-tetrate-v3
+description: Helm chart for deploying Istio gateways
+icon: https://istio.io/latest/favicons/android-192x192.png
+keywords:
+- istio
+- egressgateway
+- gateways
+name: istio-egress
+sources:
+- http://github.com/istio/istio
+version: 1.16.7-tetrate-v3
