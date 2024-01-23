@@ -1,1 +1,1 @@
-# Tetrate Istio Distribution Helm charts
+# Tetrate Istio Distribution Helm Charts
