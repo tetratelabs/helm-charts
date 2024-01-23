@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/dio/sh"
 )
@@ -35,17 +36,26 @@ func PackIstio(ctx context.Context) error {
 // URL gives prefix for the tarballs. For example: https://github.com/tetratelabs/legacy-charts/releases/download.
 func Index(ctx context.Context, url string) error {
 	dir := filepath.Join("dist")
-	indexYAML := filepath.Join("gh-pages", "index.yaml")
+	indexYAML := filepath.Join(dir, "index.yaml")
+	previousIndexYAML := filepath.Join("gh-pages", "index.yaml")
 	args := []string{
 		"repo",
 		"index",
 		dir,
 		"--url", url,
 	}
-	if _, err := os.Stat(indexYAML); err == nil {
-		args = append(args, "--merge", indexYAML)
+	if _, err := os.Stat(previousIndexYAML); err == nil {
+		args = append(args, "--merge", previousIndexYAML)
 	}
-	return sh.Run(ctx, "helm", args...)
+	if err := sh.Run(ctx, "helm", args...); err != nil {
+		return err
+	}
+	b, err := os.ReadFile(filepath.Join(dir, "index.yaml"))
+	if err != nil {
+		return err
+	}
+	sanitized := strings.ReplaceAll(string(b), "istio-/", "istio-")
+	return os.WriteFile(indexYAML, []byte(sanitized), os.ModePerm)
 }
 
 func packVersioned(ctx context.Context, version string) error {
@@ -69,15 +79,15 @@ func packVersioned(ctx context.Context, version string) error {
 		return nil
 	}
 
-	dir := filepath.Join("charts", "istio", tag)
+	dir := filepath.Join("charts", "istio", version)
+	dst := filepath.Join("dist", version)
+	_ = os.MkdirAll(dst, os.ModePerm)
+
 	charts, err := chartYAMLs(dir, "Chart.yaml", "*/Chart.yaml", "*/*/Chart.yaml", "*/*/*/Chart.yaml", "*/*/*/*/Chart.yaml")
 	if err != nil {
 		return err
 	}
-
-	dst := filepath.Join("dist", version)
 	for _, chart := range charts {
-		_ = os.MkdirAll(dst, os.ModePerm)
 		if err := sh.Run(ctx,
 			"helm",
 			"package",
