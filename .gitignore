@@ -2,3 +2,5 @@
 
 /dist
 /gh-pages
+
+*.tgz
