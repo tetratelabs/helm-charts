@@ -17,6 +17,16 @@ if [ ! -d $HERE/charts/istio/$VERSION ]; then
     exit 1
 fi
 
+if [ -z "$GPG_SIGNER" ]; then
+    echo "GPG_SIGNER must be specified"
+    exit 1
+fi
+
+if [ -z "$GPG_PASSPHRASE" ]; then
+    echo "GPG_PASSPHRASE must be specified"
+    exit 1
+fi
+
 TMPDIR=$(mktemp -d)
 trap "cd $HERE && rm -rf $TMPDIR" EXIT
 
@@ -42,7 +52,7 @@ for ITEM in $ITEMS; do
     CHART_URL=$URL/release-istio-$VERSION/$ITEM-$ISTIO_VERSION.tgz
     LAST_ITEM=/$ITEM-$ISTIO_VERSION.tgz/
     echo "Processing $ITEM $ISTIO_VERSION $CHART_URL"
-    helm package $HERE/charts/istio/$VERSION/$ITEM
+    echo $GPG_PASSPHRASE |helm package --sign $HERE/charts/istio/$VERSION/$ITEM --key $GPG_SIGNER --passphrase-file -
     if [ -f $TMPDIR/index.yaml ]; then
         helm repo index  . --merge $TMPDIR/index.yaml --url $CHART_URL 
     else
@@ -52,6 +62,7 @@ done
 
 mkdir $HERE/build
 cp -f $TMPDIR/*.tgz $HERE/build
+cp -f $TMPDIR/*.tgz.prov $HERE/build
 
 sed -i "sX${LAST_ITEM}X/Xg" $TMPDIR/index.yaml
 
