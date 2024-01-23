@@ -36,26 +36,30 @@ func PackIstio(ctx context.Context) error {
 // URL gives prefix for the tarballs. For example: https://github.com/tetratelabs/legacy-charts/releases/download.
 func Index(ctx context.Context, url string) error {
 	dir := filepath.Join("dist")
+	if _, err := os.Stat(dir); err != nil {
+		fmt.Println("missing dist, nothing to do")
+		return nil
+	}
 	indexYAML := filepath.Join(dir, "index.yaml")
-	previousIndexYAML := filepath.Join("gh-pages", "index.yaml")
+	publishedIndexYAML := filepath.Join("gh-pages", "index.yaml")
 	args := []string{
 		"repo",
 		"index",
 		dir,
 		"--url", url,
 	}
-	if _, err := os.Stat(previousIndexYAML); err == nil {
-		args = append(args, "--merge", previousIndexYAML)
+	if _, err := os.Stat(publishedIndexYAML); err == nil {
+		args = append(args, "--merge", publishedIndexYAML)
 	}
 	if err := sh.Run(ctx, "helm", args...); err != nil {
 		return err
 	}
-	b, err := os.ReadFile(filepath.Join(dir, "index.yaml"))
+	b, err := os.ReadFile(indexYAML)
 	if err != nil {
 		return err
 	}
 	sanitized := strings.ReplaceAll(string(b), "istio-/", "istio-")
-	return os.WriteFile(indexYAML, []byte(sanitized), os.ModePerm)
+	return os.WriteFile(publishedIndexYAML, []byte(sanitized), os.ModePerm)
 }
 
 func packVersioned(ctx context.Context, version string) error {

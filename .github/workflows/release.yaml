@@ -1,0 +1,51 @@
+name: Build and release
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: build-and-release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-index:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+        with:
+          path: gh-pages
+          ref: gh-pages
+      - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4.1.0
+        with:
+          go-version: 1.21.6
+      - uses: magefile/mage-action@6a5dcb5fe61f43d7c08a98bc3cf9bc63c308c08e # v3.0.0
+        with:
+          install-only: true
+      - uses: crazy-max/ghaction-import-gpg@82a020f1f7f605c65dd2449b392a52c3fcfef7ef # v6.0.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - run: mage packistio
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - if: github.ref == 'refs/heads/main'
+        run: mage index https://github.com/tetratelabs/legacy-charts/releases/download/istio-
+      - if: github.ref == 'refs/heads/main'
+        uses: stefanzweifel/git-auto-commit-action@8756aa072ef5b4a080af5dc8fef36c5d586e521d # v5.0.0
+        with:
+          repository: gh-pages
+          commit_message: Apply automatic update for install.sh
+          branch: gh-pages
+          commit_user_name: tetrate-ci
+          commit_user_email: 52504619+tetrate-ci@users.noreply.github.com
+          commit_author: tetrate-ci[bot] <52504619+tetrate-ci@users.noreply.github.com>
+          file_pattern: '*.yaml'
