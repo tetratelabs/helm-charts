@@ -15,6 +15,7 @@ import (
 )
 
 var FORCED = len(os.Getenv("FORCED")) > 0
+var DRY_RUN = len(os.Getenv("DRY_RUN")) > 0
 var GH_TOKEN = os.Getenv("GH_TOKEN")
 var GPG_PASSPHRASE = os.Getenv("GPG_PASSPHRASE")
 var GPG_TRUSTEE = "trustee@tetrate-istio-subscription.iam.gserviceaccount.com"
@@ -23,85 +24,24 @@ var ENV_MAP = map[string]string{
 	"TZ":       "UTC",
 }
 
-// PackIstio packs a versioned Istio Helm chart, for example: 1.16.6-tetrate-v0.
+// PackIstio packs versioned Istio Helm charts.
 func PackIstio(ctx context.Context) error {
-	// Export keyring.
-	ring, pass, err := exportSecretKey(ctx)
-	if err != nil {
-		return err
-	}
-
-	dir := filepath.Join("charts", "istio")
-	versions, err := os.ReadDir(dir)
-	if err != nil {
-		return err
-	}
-	for _, version := range versions {
-		if err := packVersionedIstio(ctx, version.Name(), ring, pass); err != nil {
-			return err
-		}
-	}
-	return nil
+	return packCharts(ctx, filepath.Join("charts", "istio"), packVersionedIstio)
 }
 
+// PackAddons packs addons Helm charts.
 func PackAddons(ctx context.Context) error {
-	// Export keyring.
-	ring, pass, err := exportSecretKey(ctx)
-	if err != nil {
-		return err
-	}
-
-	dir := filepath.Join("charts", "addons")
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return err
-	}
-	for _, entry := range entries {
-		if err := packChart(ctx, dir, entry.Name(), ring, pass); err != nil {
-			return err
-		}
-	}
-	return nil
+	return packCharts(ctx, filepath.Join("charts", "addons"), packChart)
 }
 
+// PackDemos packs demos Helm charts
 func PackDemos(ctx context.Context) error {
-	// Export keyring.
-	ring, pass, err := exportSecretKey(ctx)
-	if err != nil {
-		return err
-	}
-
-	dir := filepath.Join("charts", "demos")
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return err
-	}
-	for _, entry := range entries {
-		if err := packChart(ctx, dir, entry.Name(), ring, pass); err != nil {
-			return err
-		}
-	}
-	return nil
+	return packCharts(ctx, filepath.Join("charts", "demos"), packChart)
 }
 
+// PackSystem packs system Helm charts.
 func PackSystem(ctx context.Context) error {
-	// Export keyring.
-	ring, pass, err := exportSecretKey(ctx)
-	if err != nil {
-		return err
-	}
-
-	dir := filepath.Join("charts", "system")
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return err
-	}
-	for _, entry := range entries {
-		if err := packChart(ctx, dir, entry.Name(), ring, pass); err != nil {
-			return err
-		}
-	}
-	return nil
+	return packCharts(ctx, filepath.Join("charts", "system"), packChart)
 }
 
 // Index generates Helm charts index, and optionally merge with existing index.yaml.
@@ -137,11 +77,35 @@ func Index(ctx context.Context, url string) error {
 	return os.WriteFile(publishedIndexYAML, []byte(sanitized), os.ModePerm)
 }
 
-func packChart(ctx context.Context, dir, name, ring, pass string) error {
-	charts, err := chartYAMLs(dir, "Chart.yaml", "*/Chart.yaml", "*/*/Chart.yaml", "*/*/*/Chart.yaml", "*/*/*/*/Chart.yaml")
+// packCharts packs all charts inside a directory.
+func packCharts(ctx context.Context, dir string,
+	packer func(context.Context, string, string, string) error) error {
+	// Export keyring.
+	ring, pass, err := exportSecretKey(ctx)
 	if err != nil {
 		return err
 	}
+
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if err := packer(ctx, filepath.Join(dir, entry.Name()), ring, pass); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// packChart packs a chart.
+func packChart(ctx context.Context, dir, ring, pass string) error {
+	charts, err := filePaths(dir,
+		"Chart.yaml", "*/Chart.yaml", "*/*/Chart.yaml", "*/*/*/Chart.yaml", "*/*/*/*/Chart.yaml")
+	if err != nil {
+		return err
+	}
+
 	for _, chart := range charts {
 		metadata, err := chartutil.LoadChartfile(filepath.Join(chart))
 		if err != nil {
@@ -189,6 +153,11 @@ func packChart(ctx context.Context, dir, name, ring, pass string) error {
 			files = append(files, filepath.Join(dst, entry.Name()))
 		}
 
+		if DRY_RUN {
+			fmt.Println("tag", tag, "files", files)
+			continue
+		}
+
 		if released {
 			return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "upload", tag, "--clobber"}, files...)...)
 		}
@@ -198,7 +167,9 @@ func packChart(ctx context.Context, dir, name, ring, pass string) error {
 	return nil
 }
 
-func packVersionedIstio(ctx context.Context, version, ring, pass string) error {
+// packVersionedIstio packs a versioned Istio.
+func packVersionedIstio(ctx context.Context, dir, ring, pass string) error {
+	version := filepath.Base(dir)
 	tag := "istio-" + version
 
 	// If already published, skip it unless FORCED.
@@ -209,11 +180,11 @@ func packVersionedIstio(ctx context.Context, version, ring, pass string) error {
 		return nil
 	}
 
-	dir := filepath.Join("charts", "istio", version)
-	dst := filepath.Join("dist", version)
+	dst := filepath.Join("dist", tag)
 	_ = os.MkdirAll(dst, os.ModePerm)
 
-	charts, err := chartYAMLs(dir, "Chart.yaml", "*/Chart.yaml", "*/*/Chart.yaml", "*/*/*/Chart.yaml", "*/*/*/*/Chart.yaml")
+	charts, err := filePaths(dir,
+		"Chart.yaml", "*/Chart.yaml", "*/*/Chart.yaml", "*/*/*/Chart.yaml", "*/*/*/*/Chart.yaml")
 	if err != nil {
 		return err
 	}
@@ -243,16 +214,22 @@ func packVersionedIstio(ctx context.Context, version, ring, pass string) error {
 		files = append(files, filepath.Join(dst, entry.Name()))
 	}
 
+	if DRY_RUN {
+		fmt.Println("tag", tag, "files", files)
+		return nil
+	}
+
 	if released {
 		return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "upload", tag, "--clobber"}, files...)...)
 	}
 	return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "create", tag, "-n", tag, "-t", tag}, files...)...)
 }
 
-func chartYAMLs(build string, patterns ...string) ([]string, error) {
+// filePaths retrieves all matched patterns file paths.
+func filePaths(dir string, patterns ...string) ([]string, error) {
 	result := []string{}
 	for _, pattern := range patterns {
-		files, err := filepath.Glob(filepath.Join(build, pattern))
+		files, err := filepath.Glob(filepath.Join(dir, pattern))
 		if err != nil {
 			return result, err
 		}
@@ -261,6 +238,7 @@ func chartYAMLs(build string, patterns ...string) ([]string, error) {
 	return result, nil
 }
 
+// exportSecretKey exports keys from keyring.
 func exportSecretKey(ctx context.Context) (string, string, error) {
 	ring, err := os.CreateTemp(os.TempDir(), "keyring.*.gpg")
 	if err != nil {
@@ -283,6 +261,7 @@ func exportSecretKey(ctx context.Context) (string, string, error) {
 		"--export-secret-key", GPG_TRUSTEE)
 }
 
+// resolveDeps resolves dependencies of a chart.
 func resolveDeps(ctx context.Context, chart string, metadata *chart.Metadata) error {
 	if len(metadata.Dependencies) == 0 {
 		return nil
