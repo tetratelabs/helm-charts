@@ -34,7 +34,7 @@ func PackAddons(ctx context.Context) error {
 	return packCharts(ctx, filepath.Join("charts", "addons"), packChart)
 }
 
-// PackDemos packs demos Helm charts
+// PackDemos packs demos Helm charts.
 func PackDemos(ctx context.Context) error {
 	return packCharts(ctx, filepath.Join("charts", "demos"), packChart)
 }
