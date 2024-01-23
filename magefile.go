@@ -105,7 +105,7 @@ func PackSystem(ctx context.Context) error {
 }
 
 // Index generates Helm charts index, and optionally merge with existing index.yaml.
-// URL gives prefix for the tarballs. For example: https://github.com/tetratelabs/legacy-charts/releases/download.
+// URL gives prefix for the tarballs. For example: https://github.com/tetratelabs/helm-charts/releases/download.
 func Index(ctx context.Context, url string) error {
 	dir := filepath.Join("dist")
 	if _, err := os.Stat(dir); err != nil {

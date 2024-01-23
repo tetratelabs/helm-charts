@@ -49,7 +49,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - if: github.ref == 'refs/heads/main'
-        run: mage index https://github.com/tetratelabs/legacy-charts/releases/download
+        run: mage index https://github.com/tetratelabs/helm-charts/releases/download
       - if: github.ref == 'refs/heads/main'
         uses: stefanzweifel/git-auto-commit-action@8756aa072ef5b4a080af5dc8fef36c5d586e521d # v5.0.0
         with:
