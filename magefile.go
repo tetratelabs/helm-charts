@@ -155,7 +155,7 @@ func packChart(ctx context.Context, dir, name, ring, pass string) error {
 		tag := metadata.Name + "-" + metadata.Version
 
 		// If already published, skip it unless FORCED.
-		err = sh.RunWithV(ctx, ENV_MAP, "gh", "release", "view", tag, "-R", "tetratelabs/legacy-charts")
+		err = sh.RunWithV(ctx, ENV_MAP, "gh", "release", "view", tag)
 		released := err == nil
 		if released && !FORCED {
 			fmt.Printf("%s is already published\n", tag)
@@ -178,7 +178,23 @@ func packChart(ctx context.Context, dir, name, ring, pass string) error {
 		); err != nil {
 			return err
 		}
+
+		entries, err := os.ReadDir(dst)
+		if err != nil {
+			return err
+		}
+
+		files := []string{}
+		for _, entry := range entries {
+			files = append(files, filepath.Join(dst, entry.Name()))
+		}
+
+		if released {
+			return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "upload", tag, "--clobber"}, files...)...)
+		}
+		return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "create", tag, "-n", tag, "-t", tag}, files...)...)
 	}
+
 	return nil
 }
 
@@ -186,7 +202,7 @@ func packVersionedIstio(ctx context.Context, version, ring, pass string) error {
 	tag := "istio-" + version
 
 	// If already published, skip it unless FORCED.
-	err := sh.RunWithV(ctx, ENV_MAP, "gh", "release", "view", tag, "-R", "tetratelabs/legacy-charts")
+	err := sh.RunWithV(ctx, ENV_MAP, "gh", "release", "view", tag)
 	released := err == nil
 	if released && !FORCED {
 		fmt.Printf("%s is already published\n", tag)
@@ -228,9 +244,9 @@ func packVersionedIstio(ctx context.Context, version, ring, pass string) error {
 	}
 
 	if released {
-		return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "upload", tag, "--clobber", "-R", "tetratelabs/legacy-charts"}, files...)...)
+		return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "upload", tag, "--clobber"}, files...)...)
 	}
-	return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "create", tag, "-n", tag, "-t", tag, "-R", "tetratelabs/legacy-charts"}, files...)...)
+	return sh.RunWithV(ctx, ENV_MAP, "gh", append([]string{"release", "create", tag, "-n", tag, "-t", tag}, files...)...)
 }
 
 func chartYAMLs(build string, patterns ...string) ([]string, error) {
