@@ -48,6 +48,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          DRY_RUN: ${{ github.ref == 'refs/heads/main' && '' || '1' }}
       - if: github.ref == 'refs/heads/main'
         run: mage index https://github.com/tetratelabs/helm-charts/releases/download
       - if: github.ref == 'refs/heads/main'
