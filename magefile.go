@@ -214,8 +214,6 @@ func packVersionedIstio(ctx context.Context, dir, ring, pass string) error {
 		files = append(files, filepath.Join(dst, entry.Name()))
 	}
 
-	fmt.Println("DRY_RUN", DRY_RUN, len(os.Getenv("DRY_RUN")))
-
 	if DRY_RUN {
 		fmt.Println("tag", tag, "files", files)
 		return nil
