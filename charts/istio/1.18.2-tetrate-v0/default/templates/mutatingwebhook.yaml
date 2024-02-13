@@ -2,10 +2,7 @@
 # Removed paths for legacy and default selectors since a revision tag
 # is inherently created from a specific revision
 {{/* Copy just what we need to avoid expensive deepCopy */}}
-{{- $whv := dict
- "revision" .Values.revision
-  "injectionURL" .Values.istiodRemote.injectionURL
-  "namespace" .Release.Namespace }}
+{{- $whv := dict "revision" .Values.revision  "injectionURL" .Values.istiodRemote.injectionURL  "namespace" .Release.Namespace }}
 {{- define "core" }}
 - name: {{.Prefix}}sidecar-injector.istio.io
   clientConfig:
