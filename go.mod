@@ -4,7 +4,7 @@ go 1.21.6
 
 require (
 	github.com/dio/sh v0.0.0-20231103061956-bba8896f8c6a
-	helm.sh/helm/v3 v3.14.0
+	helm.sh/helm/v3 v3.14.2
 )
 
 require (
