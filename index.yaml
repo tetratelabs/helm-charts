@@ -4573,6 +4573,31 @@ entries:
       tetrate.io/demo: "true"
     apiVersion: v2
     appVersion: v0.1.0
+    created: "2024-02-27T13:42:10.430944594Z"
+    dependencies:
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 6.58.4
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 19.6.1
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.14.0
+    description: Helm chart for deploying Istio Monitoring demo
+    digest: 2a576cfa386031065de0bfd21c02d45f348eb9849927aca44da8ac5505d71138
+    name: istio-monitoring-demo
+    type: application
+    urls:
+    - https://github.com/tetratelabs/helm-charts/releases/download/istio-monitoring-demo-0.3.0/istio-monitoring-demo-0.3.0.tgz
+    version: 0.3.0
+  - annotations:
+      tetrate.io/demo: "true"
+    apiVersion: v2
+    appVersion: v0.1.0
     created: "2024-01-23T17:07:15.092824973Z"
     dependencies:
     - condition: grafana.enabled
@@ -7481,4 +7506,4 @@ entries:
     urls:
     - https://github.com/tetratelabs/helm-charts/releases/download/istio-1.18.2-tetrate-v1/ztunnel-1.18.2-tetrate-v1.tgz
     version: 1.18.2-tetrate-v1
-generated: "2024-02-19T16:29:14.35890751Z"
+generated: "2024-02-27T13:42:10.420788594Z"
